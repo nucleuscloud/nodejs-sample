@@ -21,3 +21,17 @@ DEFAULT_NAME=Everybody npm start
 
 curl localhost:3000
 ```
+
+## Build and Run Docker
+```
+docker build . -t <tag>
+docker run --rm -it -p 127.0.0.1:3000:3000/tcp <tag>
+
+curl localhost:3000
+```
+
+
+## Building for multi-platform
+```
+docker buildx build --platform=linux/arm64,linux/amd64 . -f ./Dockerfile -t ghcr.io/nucleuscloud/nodejs-sample:latest
+```
