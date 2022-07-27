@@ -11,6 +11,7 @@ http.createServer(async function (req, res) {
       name = queryObject.name;
     }
 
+    const dependentData = {};
     const depUrl = process.env.SERVICE_B_URL
     if (depUrl) {
       try {
@@ -18,13 +19,26 @@ http.createServer(async function (req, res) {
           url: depUrl,
         });
         console.log('Dependent output:', output.data);
+        dependentData.status = output.status;
+        dependentData.statusText = output.statusText;
+        dependentData.data = output.data;
       } catch (err) {
+        if (err instanceof axios.AxiosError) {
+          if (err.response) {
+            dependentData.status = err.response.status;
+            dependentData.statusText = err.response.statusText;
+            dependentData.data = err.response.data;
+          }
+        }
         console.error(err);
       }
     }
 
-    res.writeHead(200, {'Content-Type': 'text/plain'});
-    res.end(`Hello ${name}\n`);
+    res.writeHead(200, {'Content-Type': 'application/json'});
+    res.end({
+      data: `hello ${name}`,
+      dependentData,
+    });
 }).listen(port, "0.0.0.0", () => {
   console.log(`Server running at http://0.0.0.0:${port}/`);
 });
